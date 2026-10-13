@@ -282,4 +282,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Silently fail — follow-ups are non-critical
         }
     }
+
+    // Auto-run if ?q= query param is provided in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialQuery = urlParams.get('q');
+    if (initialQuery) {
+        promptInput.value = initialQuery;
+        searchBtn.click();
+    }
 });

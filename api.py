@@ -3,9 +3,18 @@ import sys
 import json
 import asyncio
 import re
+from dotenv import load_dotenv
 
-# Set dummy API key to prevent ChatOpenAI from crashing on import if missing
-os.environ.setdefault("OPENAI_API_KEY", "dummy_key_to_prevent_crash")
+# Load .env first
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"), override=True)
+
+# Also ensure DATABASE_URL is uppercase if only Database_URL was set in .env
+if "Database_URL" in os.environ and "DATABASE_URL" not in os.environ:
+    os.environ["DATABASE_URL"] = os.environ["Database_URL"]
+
+# Set dummy API key only if no key exists (for build environments)
+if not os.environ.get("OPENAI_API_KEY"):
+    os.environ["OPENAI_API_KEY"] = "dummy_key_to_prevent_crash"
 
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
@@ -166,11 +175,13 @@ async def ask_question(req: QueryRequest):
             }
 
     except Exception as e:
+        print(f"[Error in /ask]: {e}", file=sys.stderr)
         try:
             error_result = error_graph.invoke({"error_message": str(e)})
             friendly_msg = error_result.get("friendly_message", "An unexpected error occurred. Please try again later.")
             return {"error": friendly_msg}
-        except Exception:
+        except Exception as inner_e:
+            print(f"[Error in error_graph]: {inner_e}", file=sys.stderr)
             return {"error": "We're experiencing technical difficulties and cannot process your request right now. Please try again later."}
 
 @app.get("/history")

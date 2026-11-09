@@ -1,0 +1,30 @@
+# Environment and credentials
+.env
+.env.*
+*.env
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Git
+.git/
+.gitignore
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Jupyter & scratch files
+.ipynb_checkpoints/
+scratch/
+scratch_*.py
+
+# Documentation & large PDFs
+*.pdf
+docs/

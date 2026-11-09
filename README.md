@@ -10,26 +10,63 @@
 
 ---
 
-## 📸 Visual Showcase
+## 📸 Visual Showcase & How It Works
 
-### 1. Natural Language Data Explorer & Schema Inspector
-Enter business questions in plain English. The interactive sidebar immediately displays available Neon tables and schema columns for quick discovery.
+### 1. Natural Language Data Explorer & Live Schema Inspector
+Users enter high-level business questions in plain English or click one of the quick starter chips. The right-hand sidebar dynamically inspects the live Neon PostgreSQL database, displaying tables, columns, primary keys, and foreign keys.
 
 ![DataFlow Explorer](docs/images/main_explorer.png)
 
+* **Natural Language Input:** Accepts complex analytical questions and automatically determines query intent.
+* **Instant Schema Discovery:** Auto-introspects table structures (e.g. `sales_data`, `customer_lookup`, `product_lookup`) and caches them in memory for zero-latency lookups.
+* **Starter Exploration Chips:** Pre-configured prompts allow instant discovery of top orders, customer trends, and database record summaries with a single click.
+
 ---
 
-### 2. Intelligent Query Execution, Smart Tables & Follow-ups
-The SQL agent constructs optimized PostgreSQL queries, validates safety, renders tabular results with column sorting and CSV download, and suggests intelligent follow-up exploration paths.
+### 2. Intelligent Query Execution, Smart Tables & AI Follow-ups
+When a query executes, the SQL Agent synthesizes an optimized PostgreSQL statement, runs it against the database, presents a tabular breakdown with sorting/filtering, and offers intelligent follow-ups to keep the analytical workflow moving.
 
 ![DataFlow Query Workspace](docs/images/query_results_full.png)
 
+* **Executive Summary:** Synthesizes complex multi-row results into clean, plain-English bullet points.
+* **Interactive Smart Table:** Client-side row filtering, column-based sorting, and one-click **CSV download** for immediate export into Excel or Google Sheets.
+* **Verified PostgreSQL Query:** Displays the exact query generated and executed, with one-click **Copy SQL** functionality for transparency and auditing.
+* **Proactive Follow-up Prompts:** Automatically suggests 3 contextual next questions based on the retrieved dataset to guide deeper business intelligence.
+
 ---
 
-### 3. Real-Time Insights & Chart Dashboard
-Visualizations and executive summaries stream in real-time. Chart queries automatically route to Chart.js widgets, while AI-generated business insights highlight underlying patterns and opportunities.
+### 3. Real-Time Streaming Insights & Chart Dashboard
+Visualizations and business takeaways stream in real time over Server-Sent Events (SSE) without requiring any page reload.
 
 ![Live Insights Dashboard](docs/images/dashboard_analytics.png)
+
+* **Reactive Chart.js Widgets:** Metric queries automatically generate dynamic Bar, Line, Pie, and Doughnut charts.
+* **AI Business Takeaways:** An autonomous insight agent analyzes query results and surfaces actionable executive observations.
+* **Full-Screen Focus Mode:** Expand any chart or insight card into a high-resolution modal for executive presentations.
+
+---
+
+## 🔍 How It Works: Step-by-Step Query Lifecycle
+
+Here is what happens under the hood when a user asks a question:
+
+### Example: *"Show summary of all tables and record counts in the database"*
+
+1. **Routing:** The Router Agent receives the question and classifies intent (`data_query` vs. `chart`).
+2. **Schema Introspection:** The LangGraph SQL pipeline fetches cached table metadata from Neon PostgreSQL.
+3. **Query Generation:** The LLM produces a multi-table `UNION ALL` query with PostgreSQL-compliant syntax:
+   ```sql
+   SELECT 'sales_data' AS "Table Name", COUNT(*) AS "Record Count" FROM sales_data
+   UNION ALL
+   SELECT 'customer_lookup', COUNT(*) FROM customer_lookup
+   UNION ALL
+   SELECT 'product_lookup', COUNT(*) FROM product_lookup;
+   ```
+4. **Safety Sanitization:** `ensure_read_only_sql()` verifies via regex and AST parsing that only read-only `SELECT` statements are executed, rejecting any mutations or multi-statement attacks.
+5. **Database Dispatch:** Query runs over Neon's connection pooler with automatic date formatting (`options="-c datestyle=ISO,DMY"`).
+6. **Synthesis:** The LLM converts the result table into an executive summary:
+   > *"The summary of all tables and their record counts in the database is as follows: sales_data: 56,046 records, customer_lookup: 18,154 records, product_lookup: 293 records..."*
+7. **Follow-ups & SSE Broadcast:** The Follow-up Agent generates 3 deep-dive exploration questions, while the Dashboard Agent broadcasts real-time takeaways to the Live Dashboard via SSE.
 
 ---
 

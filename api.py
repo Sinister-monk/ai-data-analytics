@@ -94,6 +94,10 @@ def read_index():
 def read_dashboard():
     return FileResponse(os.path.join(BASE_DIR, "public", "dashboard.html"))
 
+@app.get("/font-preview")
+def read_font_preview():
+    return FileResponse(os.path.join(BASE_DIR, "public", "font_preview.html"))
+
 @app.post("/ask")
 async def ask_question(req: QueryRequest):
     try:

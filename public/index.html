@@ -4,62 +4,174 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Ask questions about your Neon database in plain English. Powered by AI agents.">
-    <title>viggy's data retrieval AI</title>
-    <link rel="stylesheet" href="/static/style.css?v=3">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
-    <script src="/static/utils.js?v=2"></script>
+    <title>DataFlow | Agentic AI Analytics with Neon</title>
+    <link rel="stylesheet" href="/static/style.css?v=5">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="/static/utils.js?v=5"></script>
 </head>
 <body>
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container"></div>
 
+    <!-- Top Glassmorphic Navigation -->
+    <header class="app-header">
+        <div class="logo">
+            <div class="brand-logo-frame">
+                <!-- Database Cylinder Line Sketch -->
+                <svg class="sketch-icon blue" width="22" height="22" viewBox="0 0 24 24">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                </svg>
+            </div>
+            <h1>DataFlow</h1>
+            <div class="brand-badge">
+                <span class="beacon-ring"></span> Neon DB Connected
+            </div>
+        </div>
+
+        <a href="/dashboard" class="btn-dashboard" target="_blank">
+            <!-- Dashboard Grid Line Sketch -->
+            <svg class="sketch-icon" width="16" height="16" viewBox="0 0 24 24" style="stroke:#FFFFFF;">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            Live Dashboard
+        </a>
+    </header>
+
     <div class="page-layout">
         
         <!-- Left: Main Workspace -->
         <div class="main-workspace">
-            <header class="app-header">
-                <div style="display:flex; align-items:center; gap:0.8rem;">
-                    <div class="logo">
-                        <img src="/static/db.png" alt="Database Logo" class="logo-icon-img">
-                        <h1>DataFlow</h1>
-                    </div>
-                </div>
-                <a href="/dashboard" class="btn-dashboard" target="_blank">
-                    <img src="/static/dashboard.png" alt="Dashboard Icon" style="width:16px; height:16px; object-fit:contain;"> Go to Dashboard
-                </a>
-            </header>
-
             <main>
                 <div class="hero-section">
+                    <div class="hero-tag">
+                        <!-- Sparkle Line Sketch -->
+                        <svg class="sketch-icon blue" width="14" height="14" viewBox="0 0 24 24">
+                            <polygon points="12 2 15 8.5 22 9.5 17 14.5 18.5 21.5 12 18 5.5 21.5 7 14.5 2 9.5 9 8.5 12 2"></polygon>
+                        </svg>
+                        Autonomous Data Intelligence
+                    </div>
                     <h2>What would you like to explore?</h2>
-                    <p>Ask questions, create charts, or view data tables.</p>
+                    <p>Ask questions in plain English, compute analytical metrics, and visualize results on your Neon database.</p>
                 </div>
 
-                <!-- Search Box -->
+                <!-- Glassmorphic Search Box -->
                 <div class="search-container">
-                    <img src="/static/search.png" alt="Search Icon" style="width:20px; height:20px; margin-right:0.5rem; object-fit:contain;">
-                    <input type="text" id="promptInput" placeholder='e.g., "Create a chart of recent transactions" or "What is the highest num..."'>
-                    <button id="searchBtn">→</button>
+                    <!-- Search Line Sketch -->
+                    <svg class="sketch-icon blue" width="22" height="22" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="promptInput" placeholder='e.g., "Show top 5 customers by revenue" or "Plot monthly transactions"'>
+                    <span class="kbd-hint">↵ Enter</span>
+                    <button id="searchBtn">
+                        Run Query
+                        <svg class="sketch-icon" width="16" height="16" viewBox="0 0 24 24" style="stroke:#FFFFFF;">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Glass Starter Prompt Chips -->
+                <div class="starter-chips">
+                    <span class="starter-label">Try asking:</span>
+                    
+                    <button class="starter-chip" data-prompt="Show monthly revenue trends and transaction growth">
+                        <svg class="sketch-icon" width="15" height="15" viewBox="0 0 24 24">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                        Monthly Revenue Trends
+                    </button>
+
+                    <button class="starter-chip" data-prompt="What are the top 10 highest value orders?">
+                        <svg class="sketch-icon" width="15" height="15" viewBox="0 0 24 24">
+                            <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"></path>
+                            <path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"></path>
+                            <path d="M4 3h16v6a6 6 0 0 1-12 0V3z"></path>
+                            <line x1="12" y1="15" x2="12" y2="21"></line>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                        </svg>
+                        Top 10 High-Value Orders
+                    </button>
+
+                    <button class="starter-chip" data-prompt="Analyze active users and subscription churn distribution">
+                        <svg class="sketch-icon" width="15" height="15" viewBox="0 0 24 24">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="12" cy="7" r="4"></circle>
+                        </svg>
+                        Active User Churn Analysis
+                    </button>
+
+                    <button class="starter-chip" data-prompt="Show summary of all tables and record counts in the database">
+                        <svg class="sketch-icon" width="15" height="15" viewBox="0 0 24 24">
+                            <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                        </svg>
+                        Database Schema Overview
+                    </button>
                 </div>
 
                 <!-- Loading State -->
                 <div class="loading" id="loadingIndicator" style="display: none;">
                     <div class="spinner"></div>
-                    <p>Analyzing and querying database...</p>
+                    <p>Analyzing intent, crafting safe SQL, and querying Neon...</p>
                 </div>
 
                 <!-- Output Section -->
                 <div class="output-section" id="outputSection" style="display: none;">
                     
+                    <!-- Answer Card -->
                     <div class="card answer-card">
-                        <h3>Answer</h3>
+                        <div class="card-header-bar">
+                            <h3>
+                                <!-- AI Brain Line Sketch -->
+                                <svg class="sketch-icon blue" width="20" height="20" viewBox="0 0 24 24">
+                                    <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.54z"></path>
+                                    <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.54z"></path>
+                                </svg>
+                                Executive AI Synthesis
+                                <span class="glass-badge">Synthesized</span>
+                            </h3>
+                            <button id="copyAnswerBtn" class="btn-glass-tool">
+                                <!-- Copy Line Sketch -->
+                                <svg class="sketch-icon" width="14" height="14" viewBox="0 0 24 24">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                Copy Answer
+                            </button>
+                        </div>
                         <p id="answerText"></p>
                         <div id="tableContainer"></div>
                         <div id="followupContainer"></div>
                     </div>
 
+                    <!-- Generated SQL Card -->
                     <div class="card sql-card" id="sqlCard">
-                        <h3>Generated SQL</h3>
+                        <div class="card-header-bar">
+                            <h3>
+                                <!-- Code Angle Brackets Line Sketch -->
+                                <svg class="sketch-icon blue" width="20" height="20" viewBox="0 0 24 24">
+                                    <polyline points="16 18 22 12 16 6"></polyline>
+                                    <polyline points="8 6 2 12 8 18"></polyline>
+                                </svg>
+                                Generated SQL Query
+                                <span class="glass-badge">Validated Read-Only</span>
+                            </h3>
+                            <button id="copySqlBtn" class="btn-glass-tool">
+                                <svg class="sketch-icon" width="14" height="14" viewBox="0 0 24 24">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                </svg>
+                                Copy SQL
+                            </button>
+                        </div>
                         <pre><code id="sqlText"></code></pre>
                     </div>
 
@@ -67,8 +179,8 @@
                     <div class="card chart-created-card" id="chartCreatedCard" style="display: none;">
                         <span class="icon">📈</span>
                         <div class="content">
-                            <h4>Chart Generated Successfully!</h4>
-                            <p>Head over to your Live Dashboard tab to view and interact with the visualization.</p>
+                            <h4>Chart Streamed to Live Dashboard!</h4>
+                            <p>Head over to your Live Dashboard tab to view and interact with the real-time visualization.</p>
                         </div>
                     </div>
 
@@ -79,16 +191,26 @@
         <!-- Right: Schema Sidebar -->
         <aside class="schema-sidebar">
             <div class="sidebar-header">
-                <h2>Neon Database Schema</h2>
+                <h2>
+                    <span style="display:flex; align-items:center; gap:0.5rem;">
+                        <svg class="sketch-icon blue" width="18" height="18" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="9" y1="21" x2="9" y2="9"></line>
+                        </svg>
+                        Database Schema
+                    </span>
+                    <span class="glass-badge" id="schemaCountBadge">Neon DB</span>
+                </h2>
                 <input type="text" id="schemaSearchInput" placeholder="Search tables or columns..." class="schema-search">
             </div>
             <div id="schemaList" class="schema-list">
-                <div class="loading-schema">Loading schema details...</div>
+                <div class="loading-schema" style="color: var(--text-muted); font-size: 0.85rem;">Inspecting Neon tables...</div>
             </div>
         </aside>
 
     </div>
 
-    <script src="/static/app.js?v=2"></script>
+    <script src="/static/app.js?v=5"></script>
 </body>
 </html>

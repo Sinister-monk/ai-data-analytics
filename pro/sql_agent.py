@@ -18,7 +18,11 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.abspath(__file__)),
                         
 Database_URL = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL")
 if Database_URL:
-    engine = create_engine(Database_URL, connect_args={"connect_timeout": 10}, pool_pre_ping=True)
+    engine = create_engine(
+        Database_URL,
+        connect_args={"connect_timeout": 10, "options": "-c datestyle=ISO,DMY"},
+        pool_pre_ping=True
+    )
     db = SQLDatabase(engine)
 else:
     engine = None
@@ -82,6 +86,12 @@ Rules:
 - Only return the SQL query, nothing else
 - Use double quotes for column names with uppercase letters
 - Do NOT use LIMIT unless the user explicitly asks for a specific number of results. Retrieve all matching data.
+- For date and timestamp operations, strictly follow PostgreSQL syntax:
+  * Use standard ISO format 'YYYY-MM-DD' for date literals (e.g. '2024-01-01')
+  * Use DATE_TRUNC('month', column) or EXTRACT(YEAR FROM column) / EXTRACT(MONTH FROM column)
+  * Use TO_CHAR(column, 'YYYY-MM-DD') for string formatting
+  * Do NOT use SQLite-specific functions like strftime()
+  * Use proper type casts where needed (e.g. column::date)
 
 Schema:
 {state["schema_info"]}

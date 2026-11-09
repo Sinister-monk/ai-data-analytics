@@ -40,19 +40,21 @@ function createSmartTable(rawResult, containerEl) {
     
     const toolbar = document.createElement('div');
     toolbar.className = 'table-toolbar';
-    toolbar.style.cssText = 'display:flex; justify-content:space-between; margin-bottom:0.5rem; align-items:center; margin-top: 1rem;';
     
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
     searchInput.placeholder = 'Filter rows...';
     searchInput.className = 'table-search';
-    searchInput.style.cssText = 'padding:4px 8px; border-radius:4px; border:1px solid #ccc; font-size:0.85rem; background: var(--card-bg); color: var(--text-main); max-width: 60%;';
     
     const exportBtn = document.createElement('button');
-    exportBtn.className = 'btn-dashboard';
-    exportBtn.innerText = '📥 CSV';
-    exportBtn.style.padding = '4px 8px';
-    exportBtn.style.fontSize = '0.85rem';
+    exportBtn.className = 'btn-glass-tool';
+    exportBtn.innerHTML = `
+        <svg class="sketch-icon" width="14" height="14" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg> Export CSV
+    `;
     
     toolbar.appendChild(searchInput);
     toolbar.appendChild(exportBtn);

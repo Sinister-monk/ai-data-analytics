@@ -123,6 +123,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ── Starter Prompt Chips ──────────────────────────────────────────────
+    document.querySelectorAll('.starter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const prompt = chip.getAttribute('data-prompt');
+            if (prompt) {
+                promptInput.value = prompt;
+                searchBtn.click();
+            }
+        });
+    });
+
+    // ── Copy Buttons (SQL & Answer) ───────────────────────────────────────
+    const copySqlBtn = document.getElementById('copySqlBtn');
+    if (copySqlBtn) {
+        copySqlBtn.addEventListener('click', () => {
+            const sql = sqlText.textContent;
+            if (sql) {
+                navigator.clipboard.writeText(sql).then(() => {
+                    showToast('SQL query copied to clipboard!');
+                }).catch(() => {
+                    showToast('Copied SQL to clipboard');
+                });
+            }
+        });
+    }
+
+    const copyAnswerBtn = document.getElementById('copyAnswerBtn');
+    if (copyAnswerBtn) {
+        copyAnswerBtn.addEventListener('click', () => {
+            const answer = answerText.textContent;
+            if (answer) {
+                navigator.clipboard.writeText(answer).then(() => {
+                    showToast('Answer copied to clipboard!');
+                }).catch(() => {
+                    showToast('Copied answer to clipboard');
+                });
+            }
+        });
+    }
+
     // Allow Enter to submit (Shift+Enter for new line)
     promptInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
@@ -155,6 +195,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderSchema(data) {
         if (!schemaList) return;
         schemaList.innerHTML = '';
+        const countBadge = document.getElementById('schemaCountBadge');
+        if (countBadge) {
+            countBadge.textContent = `${data.length} Tables`;
+        }
+
         if (data.length === 0) {
             schemaList.innerHTML = `<div style="padding: 1rem; color: var(--text-muted);">No tables found.</div>`;
             return;
@@ -168,9 +213,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const header = document.createElement('div');
             header.className = 'schema-table-header';
             header.innerHTML = `
-                <img src="/static/db.png" alt="Database Logo" class="table-icon-img" width="22" height="22" style="margin-right:10px; object-fit:contain;">
+                <svg class="sketch-icon blue" width="18" height="18" viewBox="0 0 24 24" style="margin-right:10px;">
+                    <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
+                    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+                </svg>
                 <div class="table-name">${escapeHtml(tableObj.table)}</div>
-                <div class="table-toggle"><img src="/static/dropdown.png" width="14" height="14" alt="Toggle"></div>
+                <div class="table-toggle" style="font-size:0.75rem; color:var(--text-muted); font-family:'JetBrains Mono';">▾</div>
             `;
             header.addEventListener('click', () => {
                 item.classList.toggle('expanded');

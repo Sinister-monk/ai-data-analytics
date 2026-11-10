@@ -163,6 +163,64 @@ document.addEventListener('DOMContentLoaded', () => {
         return title.length > 60 ? title.substring(0, 57) + '...' : title;
     }
 
+    // ── Chart Colors & Styling ────────────────────────────────────────────────
+    const PALETTE = [
+        'rgba(59, 130, 246, 0.85)',   // Radiant Blue
+        'rgba(16, 185, 129, 0.85)',   // Emerald Green
+        'rgba(245, 158, 11, 0.85)',   // Amber Orange
+        'rgba(239, 68, 68, 0.85)',    // Coral Red
+        'rgba(168, 85, 247, 0.85)',   // Purple
+        'rgba(236, 72, 153, 0.85)',   // Hot Pink
+        'rgba(6, 182, 212, 0.85)',    // Cyan
+        'rgba(249, 115, 22, 0.85)',   // Vivid Orange
+        'rgba(99, 102, 241, 0.85)',   // Indigo
+        'rgba(132, 204, 22, 0.85)',   // Lime Green
+        'rgba(217, 70, 239, 0.85)',   // Fuchsia
+        'rgba(20, 184, 166, 0.85)'    // Teal
+    ];
+
+    function getPaletteColor(index) {
+        return PALETTE[index % PALETTE.length];
+    }
+
+    function styleDatasets(config, isModal = false) {
+        if (!config || !config.data || !config.data.datasets) return;
+        const totalDatasets = config.data.datasets.length;
+        const isPieOrDoughnut = config.type === 'pie' || config.type === 'doughnut';
+        const isBar = config.type === 'bar';
+
+        config.data.datasets.forEach((ds, i) => {
+            const dataLen = Array.isArray(ds.data) ? ds.data.length : 0;
+
+            if (isPieOrDoughnut || (isBar && totalDatasets === 1)) {
+                // Each bar or slice gets a distinct, vibrant color from the palette
+                ds.backgroundColor = Array.from({ length: dataLen }, (_, idx) => getPaletteColor(idx));
+                ds.borderColor = Array.from({ length: dataLen }, (_, idx) => getPaletteColor(idx).replace('0.85', '1'));
+                ds.borderWidth = isPieOrDoughnut ? 2 : 1;
+                if (isBar) {
+                    ds.borderRadius = 6;
+                }
+            } else if (config.type === 'line') {
+                const col = getPaletteColor(i);
+                ds.borderColor = col.replace('0.85', '1');
+                ds.backgroundColor = col.replace('0.85', '0.15');
+                ds.tension = ds.tension ?? 0.4;
+                ds.fill = ds.fill ?? false;
+                ds.pointRadius = isModal ? 5 : 4;
+                ds.pointHoverRadius = isModal ? 7 : 6;
+                ds.pointBackgroundColor = col.replace('0.85', '1');
+                ds.borderWidth = isModal ? 3 : 2;
+            } else {
+                // Multi-dataset bar chart: each dataset has its own series color
+                const col = getPaletteColor(i);
+                ds.backgroundColor = col;
+                ds.borderColor = col.replace('0.85', '1');
+                ds.borderWidth = 1;
+                ds.borderRadius = 6;
+            }
+        });
+    }
+
     // ── Chart Card Renderer ───────────────────────────────────────────────────
     function renderChartCard(data) {
         let config;
@@ -254,35 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const mConfig = JSON.parse(data.chart_config);
             
             // Re-apply palette logic
-            if (mConfig.data && mConfig.data.datasets) {
-                const palette = [
-                    'rgba(99, 102, 241, 0.85)',
-                    'rgba(16, 185, 129, 0.85)',
-                    'rgba(245, 158, 11, 0.85)',
-                    'rgba(239, 68, 68, 0.85)',
-                    'rgba(59, 130, 246, 0.85)',
-                    'rgba(168, 85, 247, 0.85)',
-                    'rgba(236, 72, 153, 0.85)',
-                ];
-                mConfig.data.datasets.forEach((ds, i) => {
-                    if (!ds.backgroundColor) {
-                        ds.backgroundColor = palette[i % palette.length];
-                    }
-                    if (!ds.borderColor) {
-                        ds.borderColor = palette[i % palette.length].replace('0.85', '1');
-                    }
-                    if (mConfig.type === 'line') {
-                        ds.tension     = ds.tension ?? 0.4;
-                        ds.fill        = ds.fill    ?? false;
-                        ds.pointRadius = 4; // larger points for modal
-                        ds.borderWidth = 3;
-                    }
-                    if (mConfig.type === 'bar') {
-                        ds.borderWidth = ds.borderWidth ?? 1;
-                        ds.borderRadius = ds.borderRadius ?? 4;
-                    }
-                });
-            }
+            styleDatasets(mConfig, true);
 
             const cTitle = mConfig.options?.plugins?.title?.text || chartTitle;
             mConfig.options = {
@@ -336,35 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Render Chart.js chart into the canvas
         const ctx = document.getElementById(canvasId).getContext('2d');
 
-        // Apply default styling to datasets if not set
-        if (config.data && config.data.datasets) {
-            const palette = [
-                'rgba(58, 134, 255, 0.85)',   // Electric Azure
-                'rgba(189, 178, 255, 0.85)',  // Soft Lavender
-                'rgba(255, 214, 224, 0.85)',  // Soft Pink
-                'rgba(56, 189, 248, 0.85)',   // Sky Blue
-                'rgba(129, 140, 248, 0.85)',  // Indigo
-                'rgba(244, 114, 182, 0.85)',  // Rose Pink
-            ];
-            config.data.datasets.forEach((ds, i) => {
-                if (!ds.backgroundColor) {
-                    ds.backgroundColor = palette[i % palette.length];
-                }
-                if (!ds.borderColor) {
-                    ds.borderColor = palette[i % palette.length].replace('0.85', '1');
-                }
-                if (config.type === 'line') {
-                    ds.tension     = ds.tension ?? 0.4;
-                    ds.fill        = ds.fill    ?? false;
-                    ds.pointRadius = 3;
-                    ds.borderWidth = 2;
-                }
-                if (config.type === 'bar') {
-                    ds.borderWidth = ds.borderWidth ?? 1;
-                    ds.borderRadius = ds.borderRadius ?? 4;
-                }
-            });
-        }
+        // Apply vibrant multi-color styling to datasets
+        styleDatasets(config, false);
 
         // Chart.js options: always show title + legend
         const chartJsTitle = config.options?.plugins?.title?.text || chartTitle;
@@ -439,6 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
         typePicker.addEventListener('change', (e) => {
             const newType = e.target.value;
             config.type = newType;
+            styleDatasets(config, false);
             
             const isPie = newType === 'pie' || newType === 'doughnut';
             let newChartWidth = '100%';

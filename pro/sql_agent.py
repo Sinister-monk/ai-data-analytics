@@ -85,13 +85,14 @@ write a SQL query that answers the user's question.
 Rules:
 - Only return the SQL query, nothing else
 - Use double quotes for column names with uppercase letters
-- Do NOT use LIMIT unless the user explicitly asks for a specific number of results. Retrieve all matching data.
+- When the user explicitly asks for a specific number of results (e.g. 'top 5', 'top 10'), use LIMIT N. Otherwise, do NOT use LIMIT and retrieve all matching data.
 - For date and timestamp operations, strictly follow PostgreSQL syntax:
   * Use standard ISO format 'YYYY-MM-DD' for date literals (e.g. '2024-01-01')
   * Use DATE_TRUNC('month', column) or EXTRACT(YEAR FROM column) / EXTRACT(MONTH FROM column)
   * Use TO_CHAR(column, 'YYYY-MM-DD') for string formatting
   * Do NOT use SQLite-specific functions like strftime()
   * Use proper type casts where needed (e.g. column::date)
+  * Type cast hint: "CustomerKey" in customer_lookup is TEXT while in sales_data it is BIGINT. When joining on CustomerKey, always cast: sd."CustomerKey"::text = cl."CustomerKey" (or CAST(sd."CustomerKey" AS TEXT) = cl."CustomerKey")
 
 Schema:
 {state["schema_info"]}

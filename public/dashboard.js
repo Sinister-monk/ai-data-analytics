@@ -15,10 +15,36 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const chartModal          = document.getElementById('chartModal');
     const closeModalBtn       = document.getElementById('closeModalBtn');
+    const modalChartTypePicker = document.getElementById('modalChartTypePicker');
+    const modalExportBtn      = document.getElementById('modalExportBtn');
 
     // Track chart instances so we can destroy/recreate if needed
     let chartCounter = 0;
     let modalChartInstance = null;
+    let activeModalRender = null;
+    let activeModalCardSync = null;
+
+    if (modalChartTypePicker) {
+        modalChartTypePicker.addEventListener('change', (e) => {
+            const newType = e.target.value;
+            if (typeof activeModalRender === 'function') {
+                activeModalRender(newType);
+            }
+            if (typeof activeModalCardSync === 'function') {
+                activeModalCardSync(newType);
+            }
+        });
+    }
+
+    if (modalExportBtn) {
+        modalExportBtn.addEventListener('click', () => {
+            if (!modalChartInstance) return;
+            const link = document.createElement('a');
+            link.download = 'expanded-chart.png';
+            link.href = modalChartInstance.toBase64Image();
+            link.click();
+        });
+    }
 
     if (closeModalBtn && chartModal) {
         closeModalBtn.addEventListener('click', () => {
@@ -27,6 +53,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 modalChartInstance.destroy();
                 modalChartInstance = null;
             }
+            activeModalRender = null;
+            activeModalCardSync = null;
         });
 
         chartModal.addEventListener('click', (e) => {
@@ -87,6 +115,13 @@ document.addEventListener('DOMContentLoaded', () => {
             card.classList.add('card-minimized');
             const btn = card.querySelector('.minimize-btn');
             if (btn) btn.innerHTML = '+';
+        }
+        if (saved.chartType) {
+            const picker = card.querySelector('.chart-type-picker');
+            if (picker && picker.value !== saved.chartType) {
+                picker.value = saved.chartType;
+                picker.dispatchEvent(new Event('change'));
+            }
         }
     }
 
@@ -281,10 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
         chartsGrid.appendChild(card);
         updateKpis();
 
-        // Restore saved layout before attaching observers
-        restoreCardLayout(card);
-        attachResizeObserver(card);
-
         const minimizeBtn = card.querySelector('.minimize-btn');
         minimizeBtn.addEventListener('click', () => {
             card.classList.toggle('card-minimized');
@@ -298,69 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
             removeCardLayout(card.id);
             card.remove();
             checkEmptyState();
-        });
-
-        const expandBtn = card.querySelector('.expand-btn');
-        expandBtn.addEventListener('click', () => {
-            chartModal.style.display = 'flex';
-            const ctxModal = document.getElementById('modalCanvas').getContext('2d');
-            if (modalChartInstance) {
-                modalChartInstance.destroy();
-            }
-            
-            // Re-parse config to avoid reference mutations
-            const mConfig = JSON.parse(data.chart_config);
-            
-            // Re-apply palette logic
-            styleDatasets(mConfig, true);
-
-            const cTitle = mConfig.options?.plugins?.title?.text || chartTitle;
-            mConfig.options = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        display: true,
-                        text: cTitle,
-                        font: { size: 18, weight: '700' },
-                        color: '#F8FAFC',
-                        padding: { bottom: 16 }
-                    },
-                    legend: {
-                        display: true,
-                        position: 'bottom',
-                        labels: {
-                            color: '#CBD5E1',
-                            boxWidth: 16,
-                            padding: 20,
-                            font: { size: 13 },
-                            usePointStyle: true
-                        }
-                    },
-                    tooltip: { mode: 'index', intersect: false }
-                },
-                scales: mConfig.type !== 'pie' && mConfig.type !== 'doughnut'
-                    ? {
-                        x: {
-                            grid: { color: 'rgba(255,255,255,0.08)' },
-                            ticks: { color: '#94A3B8', font: { size: 12 } }
-                        },
-                        y: {
-                            grid: { color: 'rgba(255,255,255,0.08)' },
-                            beginAtZero: true,
-                            ticks: { color: '#94A3B8', font: { size: 12 } }
-                        }
-                      }
-                    : {},
-            };
-
-            // Apply width for horizontal scrolling in modal
-            const innerDiv = document.getElementById('modalChartInner');
-            if (innerDiv) {
-                innerDiv.style.width = chartWidth;
-            }
-
-            modalChartInstance = new Chart(ctxModal, mConfig);
         });
 
         // Render Chart.js chart into the canvas
@@ -442,18 +410,127 @@ document.addEventListener('DOMContentLoaded', () => {
         typePicker.addEventListener('change', (e) => {
             const newType = e.target.value;
             config.type = newType;
+            try {
+                const parsed = JSON.parse(data.chart_config);
+                parsed.type = newType;
+                data.chart_config = JSON.stringify(parsed);
+            } catch (_) {}
+
             styleDatasets(config, false);
-            
+
             const isPie = newType === 'pie' || newType === 'doughnut';
-            let newChartWidth = '100%';
-            if (!isPie && numLabels > 10) {
-                newChartWidth = (numLabels * 40) + 'px';
-            }
-            card.querySelector('.chart-canvas-wrapper').style.width = newChartWidth;
-            
+            config.options.scales = !isPie
+                ? {
+                    x: {
+                        grid: { color: 'rgba(255,255,255,0.06)' },
+                        ticks: { color: '#94A3B8', font: { size: 10 } }
+                    },
+                    y: {
+                        grid: { color: 'rgba(255,255,255,0.06)' },
+                        beginAtZero: true,
+                        ticks: { color: '#94A3B8', font: { size: 10 } }
+                    }
+                  }
+                : {};
+
+            chartWidth = (!isPie && numLabels > 10) ? (numLabels * 40) + 'px' : '100%';
+            const wrapper = card.querySelector('.chart-canvas-wrapper');
+            if (wrapper) wrapper.style.width = chartWidth;
+
+            saveCardLayout(card.id, { chartType: newType });
+
             if (chartInstance) chartInstance.destroy();
             chartInstance = new Chart(ctx, config);
         });
+
+        const expandBtn = card.querySelector('.expand-btn');
+        expandBtn.addEventListener('click', () => {
+            chartModal.style.display = 'flex';
+            const ctxModal = document.getElementById('modalCanvas').getContext('2d');
+            const currentType = config.type || (typePicker ? typePicker.value : 'bar');
+
+            if (modalChartTypePicker) {
+                modalChartTypePicker.value = currentType;
+            }
+
+            function renderModalChart(type) {
+                if (modalChartInstance) {
+                    modalChartInstance.destroy();
+                    modalChartInstance = null;
+                }
+
+                // Re-parse config to avoid reference mutations
+                const mConfig = JSON.parse(data.chart_config);
+                mConfig.type = type;
+
+                // Re-apply palette logic
+                styleDatasets(mConfig, true);
+
+                const isPieModal = type === 'pie' || type === 'doughnut';
+                const cTitle = mConfig.options?.plugins?.title?.text || chartTitle;
+                mConfig.options = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: cTitle,
+                            font: { size: 18, weight: '700' },
+                            color: '#F8FAFC',
+                            padding: { bottom: 16 }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                color: '#CBD5E1',
+                                boxWidth: 16,
+                                padding: 20,
+                                font: { size: 13 },
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: !isPieModal
+                        ? {
+                            x: {
+                                grid: { color: 'rgba(255,255,255,0.08)' },
+                                ticks: { color: '#94A3B8', font: { size: 12 } }
+                            },
+                            y: {
+                                grid: { color: 'rgba(255,255,255,0.08)' },
+                                beginAtZero: true,
+                                ticks: { color: '#94A3B8', font: { size: 12 } }
+                            }
+                          }
+                        : {},
+                };
+
+                // Apply width for horizontal scrolling in modal
+                const modalWidth = (!isPieModal && numLabels > 10) ? (numLabels * 40) + 'px' : '100%';
+                const innerDiv = document.getElementById('modalChartInner');
+                if (innerDiv) {
+                    innerDiv.style.width = modalWidth;
+                }
+
+                modalChartInstance = new Chart(ctxModal, mConfig);
+            }
+
+            activeModalRender = renderModalChart;
+            activeModalCardSync = (newType) => {
+                if (typePicker && typePicker.value !== newType) {
+                    typePicker.value = newType;
+                    typePicker.dispatchEvent(new Event('change'));
+                }
+            };
+
+            renderModalChart(currentType);
+        });
+
+        // Restore saved layout and attach observers after events are bound
+        restoreCardLayout(card);
+        attachResizeObserver(card);
 
         const exportBtn = card.querySelector('.export-chart-btn');
         exportBtn.addEventListener('click', () => {

@@ -7,22 +7,22 @@
 [![OpenAI GPT-4o-mini](https://img.shields.io/badge/OpenAI-GPT--4o--mini-412991.svg?logo=openai&logoColor=white)](https://openai.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**DataFlow** is a production-grade, autonomous multi-agent data intelligence platform. It translates plain-English business questions into safe, optimized PostgreSQL queries against a live [Neon](https://neon.tech/) Serverless database, performs AST-level safety sanitization, formats tabular outputs with interactive client-side exploration, derives high-level business takeaways, and streams real-time reactive visualizations to a live dashboard via Server-Sent Events (SSE).
+**DataFlow** is a production-grade, autonomous multi-agent data intelligence platform. It translates plain-English business questions into safe, optimized PostgreSQL queries against a live [Neon](https://neon.tech/) Serverless database, performs AST-level safety sanitization, formats tabular outputs with interactive client-side exploration, derives strategic business takeaways, and streams real-time reactive visualizations to a live dashboard via Server-Sent Events (SSE).
 
 ---
 
 ## 📑 Table of Contents
-- [📸 Visual Showcase](#-visual-showcase)
-- [⚙️ How It Works: Complete Working Procedure](#️-how-it-works-complete-working-procedure)
-  - [Phase 1: Ingestion & Intent Routing](#phase-1-ingestion--intent-routing)
-  - [Phase 2: Schema Introspection & Caching](#phase-2-schema-introspection--caching)
-  - [Phase 3: SQL Synthesis & Safety Guardrails](#phase-3-sql-synthesis--safety-guardrails)
-  - [Phase 4: Database Execution & Result Processing](#phase-4-database-execution--result-processing)
-  - [Phase 5: Answer Synthesis & Dual-Channel Dispatch](#phase-5-answer-synthesis--dual-channel-dispatch)
-  - [Phase 6: Real-Time SSE Streaming & Reactive Dashboard](#phase-6-real-time-sse-streaming--reactive-dashboard)
+- [📸 End-to-End Visual Showcase](#-end-to-end-visual-showcase)
+- [⚙️ Step-by-Step Working Process (With Live Captures)](#️-step-by-step-working-process-with-live-captures)
+  - [Step 1: Workspace Ingestion & Live Schema Inspection](#step-1-workspace-ingestion--live-schema-inspection)
+  - [Step 2: Analytical Query Execution, Smart Tables & Verified SQL](#step-2-analytical-query-execution-smart-tables--verified-sql)
+  - [Step 3: Intent Classification & Visualization Routing](#step-3-intent-classification--visualization-routing)
+  - [Step 4: Real-Time SSE Streaming & Live Reactive Dashboard](#step-4-real-time-sse-streaming--live-reactive-dashboard)
+  - [Step 5: Full-Screen Modal Focus View & In-Modal Type Switching](#step-5-full-screen-modal-focus-view--in-modal-type-switching)
+  - [Step 6: Enterprise Security Guardrail & AST Read-Only Protection](#step-6-enterprise-security-guardrail--ast-read-only-protection)
 - [🧠 System Architecture & Workflow](#-system-architecture--workflow)
 - [🤖 Multi-Agent Ensemble Deep-Dive](#-multi-agent-ensemble-deep-dive)
-- [🛡️ Security, Guardrails & Defensive Engineering](#️-security-guardrails--defensive-engineering)
+- [🛡️ Security & Defensive Engineering](#️-security--defensive-engineering)
 - [📊 Database Schema & Data Model](#-database-schema--data-model)
 - [📁 Repository Structure](#-repository-structure)
 - [📡 API Reference](#-api-reference)
@@ -32,137 +32,97 @@
 
 ---
 
-## 📸 Visual Showcase
+## 📸 End-to-End Visual Showcase
 
-### 1. Natural Language Data Explorer & Live Schema Inspector
-Type arbitrary business inquiries in natural language or choose quick exploration chips. The collapsible inspector queries Neon's information schema in real time to reveal tables, primary keys, and foreign keys.
+All screenshots below were captured directly from an active, headless browser session interacting with the live application connected to Neon Serverless PostgreSQL:
 
-![DataFlow Explorer](docs/images/main_explorer.png)
-
-* **Zero-Latency Metadata:** Table schema is introspected directly from Neon PostgreSQL and cached in memory.
-* **Proactive Starters:** One-click chips allow instant exploration of revenue patterns, customer cohorts, and database table summaries.
-
----
-
-### 2. Intelligent Query Execution, Smart Tables & Verified SQL
-DataFlow generates and verifies standard ANSI PostgreSQL queries, renders interactive tables, and drafts automated follow-up prompts.
-
-![DataFlow Query Workspace](docs/images/query_results_full.png)
-
-* **Executive Synthesis:** Translates dense multi-column tabular outputs into concise executive bullet points.
-* **Interactive Smart Table:** Offers instantaneous client-side sorting, column filtering, and one-click **CSV download**.
-* **Audit Transparency:** Shows the exact executed SQL query with one-click clipboard copying.
-* **Proactive Follow-ups:** Evaluates results to suggest 3 logical next questions to continue the investigation.
+| Stage | Visual Preview | Feature Highlight |
+|---|---|---|
+| **1. Workspace & Schema** | ![Main Workspace](docs/images/01_main_workspace.png) | Natural language search bar, quick chips, and live schema sidebar. |
+| **2. Relational Query & Table** | ![Query Execution](docs/images/02_query_execution_table.png) | Executive AI summary, verified SQL, interactive smart table, CSV export, and follow-ups. |
+| **3. Chart Intent Routing** | ![Chart Routing](docs/images/03_chart_generation_card.png) | Router Agent automatically detecting visualization intent and routing to dashboard. |
+| **4. Live Dashboard** | ![Live Dashboard](docs/images/04_live_dashboard.png) | Real-time SSE streaming, Chart.js widgets, and strategic business takeaways. |
+| **5. Expanded Modal View** | ![Expanded Modal](docs/images/05_expanded_modal_chart.png) | High-resolution modal presentation with in-modal chart type switcher. |
+| **6. Guardrail Protection** | ![Security Guardrail](docs/images/06_guardrail_protection.png) | Defensive AST & regex guardrail blocking mutating queries (`DROP`, `DELETE`). |
 
 ---
 
-### 3. Real-Time Streaming Insights & Reactive Dashboard
-Metrics and chart configurations stream live over Server-Sent Events (SSE) into a separate, dynamic dashboard view without page refreshing.
+## ⚙️ Step-by-Step Working Process (With Live Captures)
 
-![Live Insights Dashboard](docs/images/dashboard_analytics.png)
+### Step 1: Workspace Ingestion & Live Schema Inspection
 
-* **Dynamic Chart.js Widgets:** Metric-driven requests automatically construct responsive Bar, Line, Pie, and Doughnut charts.
-* **Autonomous Business Takeaways:** AI agents analyze data patterns and highlight strategic business insights for leadership.
-* **Modal Focus View & Layout Persistence:** Expand widgets into full-screen viewports; card preferences persist in `localStorage`.
+When the user navigates to the conversational workspace at `http://127.0.0.1:8000`, the platform connects to the Neon PostgreSQL database via SQLAlchemy and introspects all active tables and constraints.
 
----
+![Step 1: Main Workspace & Schema Inspection](docs/images/01_main_workspace.png)
 
-## ⚙️ How It Works: Complete Working Procedure
-
-The lifecycle of an inquiry spans six distinct pipeline phases:
-
-```
-[User Prompt]
-      │
-      ▼
-┌───────────────────────────┐
-│ Phase 1: Intent Routing   │ ──► Classify: 'data_query' vs. 'chart'
-└─────────────┬─────────────┘
-              │
-              ▼
-┌───────────────────────────┐
-│ Phase 2: Schema Discovery │ ──► Load cached Neon schema metadata
-└─────────────┬─────────────┘
-              │
-              ▼
-┌───────────────────────────┐
-│ Phase 3: SQL & Guardrails │ ──► LLM generates SQL ──► Strict AST & Regex Validator
-└─────────────┬─────────────┘
-              │
-              ▼
-┌───────────────────────────┐
-│ Phase 4: Database Dispatch│ ──► Execute read-only SQL via Neon connection pool
-└─────────────┬─────────────┘
-              │
-              ▼
-┌───────────────────────────┐
-│ Phase 5: Synthesis        │ ──► Generate Executive Answer & Business Takeaway
-└─────────────┬─────────────┘
-              │
-              ▼
-┌───────────────────────────┐
-│ Phase 6: Dual Dispatch    │ ──► Return REST response to Client + Push to SSE Stream
-└───────────────────────────┘
-```
+* **Conversational Input:** Accepts arbitrary analytical queries or one-click starter chips.
+* **Schema Discovery Sidebar:** Displays tables (`sales_data`, `customer_lookup`, `product_lookup`, `territory_lookup`, `calendar_lookup`), data types, and primary/foreign key relationships.
+* **In-Memory Caching:** Database metadata is cached after initial load to eliminate cold-start connection latency on serverless pools.
 
 ---
 
-### Phase 1: Ingestion & Intent Routing
-1. The user enters a question into the web interface or sends a `POST` request to `/ask`.
-2. The payload is validated with **Pydantic** (`QueryRequest`), verifying length and stripping malicious whitespace.
-3. The request enters the **Router Agent** (`pro/router_agent.py`), which uses zero-shot structured classification to categorize user intent:
-   - **`data_query`**: Fact-finding, record lookups, aggregations, counts, top-N reports.
-   - **`chart`**: Explicit or implied visualizations (e.g., *"bar chart of monthly revenue"*, *"plot orders over time"*).
+### Step 2: Analytical Query Execution, Smart Tables & Verified SQL
+
+When an analytical question is submitted (e.g., *"What are the top 5 best-selling products by total revenue?"*), the query passes into the **SQL Agent StateGraph** (`pro/sql_agent.py`).
+
+![Step 2: Analytical Query Execution](docs/images/02_query_execution_table.png)
+
+* **Synthesized Executive Summary:** The LLM converts multi-row results into clean, plain-English bullet points.
+* **Verified PostgreSQL Audit Trail:** Shows the exact executed SQL query with one-click clipboard copying.
+* **Interactive Smart Table:**
+  - Client-side sorting on every column.
+  - In-table row filtering and search.
+  - One-click **Download CSV** export for Excel or Google Sheets.
+* **Contextual Follow-ups:** Automatically suggests 3 deep-dive follow-up questions to keep the analytical discovery flowing.
 
 ---
 
-### Phase 2: Schema Introspection & Caching
-1. The query workflow enters the **SQL Agent StateGraph** (`pro/sql_agent.py`).
-2. The `get_schema` node inspects the connected **Neon PostgreSQL** database.
-3. To eliminate redundant network trips and latency on serverless connections, metadata (table definitions, primary keys, relationships, datatypes) is cached in-memory (`_cached_table_info`).
+### Step 3: Intent Classification & Visualization Routing
+
+When a question involves charts, graphs, or visual comparisons, the **Router Agent** (`pro/router_agent.py`) classifies the intent as `chart`.
+
+![Step 3: Chart Intent Routing Card](docs/images/03_chart_generation_card.png)
+
+* **Zero-Shot Classification:** Accurately routes visualization requests to the **Chart Agent** (`pro/chart_agent.py`).
+* **Instant Confirmation:** The main interface signals that the chart has been constructed and broadcast to the live dashboard.
+* **Asynchronous Execution:** The query runs against Neon, formats data into Chart.js JSON specifications, and pushes the payload across the SSE broker.
 
 ---
 
-### Phase 3: SQL Synthesis & Safety Guardrails
-1. The `generate_sql` node constructs a comprehensive prompt containing:
-   - Cached database schema.
-   - Strict dialect rules (PostgreSQL timestamp functions like `DATE_TRUNC`, standard `YYYY-MM-DD` ISO formatting, double quotes for uppercase columns).
-   - User inquiry.
-2. The model synthesizes an ANSI PostgreSQL query.
-3. **Safety Guardrail (`ensure_read_only_sql`):** Before reaching the database, the generated SQL passes through rigorous inspection:
-   - Strips code fences (```` ```sql ````) and normalizes formatting.
-   - Strips SQL inline and block comments (`--`, `/* ... */`) and string literals.
-   - Verifies that only a **single** statement exists (prohibits multi-statement query chaining with `;`).
-   - Verifies the statement strictly begins with `SELECT` or `WITH`.
-   - Rejects any mutating or administrative operations (`INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`, `TRUNCATE`, `GRANT`, `COPY`, `VACUUM`).
+### Step 4: Real-Time SSE Streaming & Live Reactive Dashboard
+
+Opening `http://127.0.0.1:8000/dashboard` mounts a real-time reactive analytics dashboard connected via Server-Sent Events (`/stream`).
+
+![Step 4: Live Insights Dashboard](docs/images/04_live_dashboard.png)
+
+* **Reactive Chart.js Widgets:** Dynamic Bar, Line, Pie, and Doughnut charts render with fluid animations without requiring page reloads.
+* **KPI Metrics Counters:** Live counters (`Total Charts`, `Strategic Insights`, `Queries Processed`) update automatically as events stream in.
+* **Strategic Business Takeaways:** An autonomous insight agent (`pro/dashboard_agent.py`) evaluates the data patterns and highlights executive takeaways for decision-makers.
+* **Interactive Card Controls:** Change chart types on the fly (Bar ↔ Line ↔ Pie ↔ Doughnut), export PNG charts, minimize, or rearrange cards.
 
 ---
 
-### Phase 4: Database Execution & Result Processing
-1. The sanitized query is dispatched through **SQLAlchemy** via Neon’s connection pooler with session options:
-   ```python
-   connect_args={"connect_timeout": 10, "options": "-c datestyle=ISO,DMY"}
-   ```
-2. Rows are extracted, mapped against column headers, and serialized into pipe-delimited tabular strings for optimal downstream LLM comprehension.
-3. If a runtime database error occurs, control shifts to the **Error Agent** (`pro/error_agent.py`), which converts raw SQL stack traces into user-friendly, actionable feedback without revealing internal table names or credentials.
+### Step 5: Full-Screen Modal Focus View & In-Modal Type Switching
+
+Clicking the **Expand** button on any dashboard chart card launches an executive presentation modal.
+
+![Step 5: Full-Screen Modal View](docs/images/05_expanded_modal_chart.png)
+
+* **High-Resolution Presentation:** Expands the chart canvas to full viewport width with optimized typography and legend layouts.
+* **Synchronized Type Switching:** Features an in-modal chart type switcher that updates the visualization instantly and syncs changes back to the dashboard card.
+* **One-Click Image Export:** Directly download high-resolution PNG snapshots of the modal chart for slide decks and reports.
 
 ---
 
-### Phase 5: Answer Synthesis & Dual-Channel Dispatch
-1. The `format_answer` node synthesizes the tabular data into concise, natural-language executive bullet points.
-2. If the request was classified as a **`data_query`**:
-   - The **Dashboard Agent** (`pro/dashboard_agent.py`) computes a high-level strategic takeaway suitable for executive stakeholders.
-   - The primary response (Answer, Verified SQL, Raw Data) is returned to the user workspace.
-   - An asynchronous task triggers the **Follow-up Suggester** (`/followup`) to predict three high-value follow-up questions.
-3. If the request was classified as a **`chart`**:
-   - The **Chart Agent** (`pro/chart_agent.py`) evaluates the dataset and generates a valid, typed **Chart.js** configuration object (Bar, Line, Pie, or Doughnut).
+### Step 6: Enterprise Security Guardrail & AST Read-Only Protection
 
----
+To prevent unauthorized database mutations or SQL injection attacks, every generated statement passes through `ensure_read_only_sql()` before execution.
 
-### Phase 6: Real-Time SSE Streaming & Reactive Dashboard
-1. Any newly minted business insight or chart configuration is serialized and broadcast across an active asynchronous `asyncio.Queue` listener pool (`/stream`).
-2. Connected clients on `/dashboard` receive the Server-Sent Event (SSE) payload instantly without polling or refreshing.
-3. All broadcast payloads are preserved in an in-memory `history` store, allowing newly opened dashboard tabs to hydrate immediately upon mounting (`/history`).
+![Step 6: Security Guardrail in Action](docs/images/06_guardrail_protection.png)
+
+* **AST & Regex Inspection:** Rejects any statements containing mutating or administrative keywords: `INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`, `TRUNCATE`, `GRANT`, `COPY`, `VACUUM`.
+* **Statement Chaining Prevention:** Strictly blocks multi-statement queries separated by semicolons (`;`).
+* **Error Agent Translation:** Raw database exceptions or security violations are intercepted by `pro/error_agent.py` and converted into courteous, non-technical explanations.
 
 ---
 
@@ -217,7 +177,7 @@ flowchart TD
 
 ---
 
-## 🛡️ Security, Guardrails & Defensive Engineering
+## 🛡️ Security & Defensive Engineering
 
 1. **Strict Read-Only Enforcement:** Every SQL query generated by the LLM is treated as untrusted input. `ensure_read_only_sql()` checks:
    - Statements must begin exclusively with `SELECT` or `WITH`.
@@ -270,7 +230,8 @@ The platform is pre-loaded with an enterprise retail and supply chain analytics 
 ├── pyproject.toml / uv.lock    # Python packaging and dependency definitions
 ├── requirements.txt            # Frozen pip dependencies
 ├── dataa/                      # Raw source datasets (AdventureWorks CSVs)
-├── docs/                       # Architecture diagrams and UI preview assets
+├── docs/                       # Architecture diagrams and live UI preview captures
+│   └── images/                 # High-resolution step-by-step screenshots
 ├── public/                     # Frontend client assets
 │   ├── index.html              # Main conversational workspace & query interface
 │   ├── app.js                  # Query execution, dynamic tables, sorting & CSV export
